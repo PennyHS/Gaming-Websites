@@ -639,7 +639,30 @@ header{
     }
   }
 
-  
+  /* Mobile animation fallbacks */
+@media (max-width: 768px) {
+    /* General fix for all animations */
+    .autoBlur, .autoTakeFull, .autoDisplay {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: blur(0) !important;
+    }
+    
+    /* Specific fix for autoTakeFull */
+    .autoTakeFull {
+        transition: all 0.8s ease-out !important;
+    }
+    
+    /* Add scroll listeners via CSS */
+    @media (prefers-reduced-motion: no-preference) {
+        .autoTakeFull:hover, .autoTakeFull:focus, .autoTakeFull:target, .autoTakeFull:active {
+            width: 100% !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            margin-bottom: 100px !important;  
+        }
+    }
+}
 
 
  /* BLUR EFFECT ANIMATION */
