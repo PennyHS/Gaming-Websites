@@ -639,34 +639,7 @@ header{
     }
   }
 
-  /* Add these to your style.css file for better mobile support */
-@media (max-width: 768px) {
-    .hero-section {
-        height: 100vh !important;
-        width: 100% !important;
-        display: block !important;
-    }
-    
-    .hero-vid {
-        display: block !important;
-        width: 100% !important;
-        height: 100% !important;
-    }
-    
-    .hero-video {
-        display: block !important;
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
-    }
-    
-    .hero-info, .next-btn, .gaming-text {
-        display: block !important;
-        opacity: 1 !important;
-        z-index: 100 !important;
-        visibility: visible !important;
-    }
-}
+  
 
 
  /* BLUR EFFECT ANIMATION */
