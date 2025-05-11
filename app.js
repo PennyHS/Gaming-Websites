@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     const nextButton = document.querySelector('.next-btn');
     const video = document.querySelector('.hero-video');
+    const heroSection = document.querySelector('.hero-section');
+    const heroInfo = document.querySelector('.hero-info');
+    const heroVid = document.querySelector('.hero-vid');
+    const gamingText = document.querySelector('.gaming-text');
     
     // Video lists
     const desktopMovieList = [
@@ -19,70 +23,98 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let index = 0;
     
-    // Add styling for the loader
-    const style = document.createElement('style');
-    style.textContent = `
-    .video-loader {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60px;
-        height: 60px;
-        border: 5px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: #edff66;
-        animation: spin 1s ease-in-out infinite;
-        z-index: 10;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    @keyframes spin {
-        to { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
-    .video-loading .video-loader {
-        opacity: 1;
-    }
-
-    .video-loading .hero-video {
-        opacity: 0.5;
-        transition: opacity 0.3s ease;
-    }
-    `;
-    document.head.appendChild(style);
-    
-    // Add a loader element to the hero-vid div
+    // Create a loading indicator element for the video
     const loaderElement = document.createElement('div');
     loaderElement.className = 'video-loader';
-    document.querySelector('.hero-vid').appendChild(loaderElement);
+    loaderElement.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border: 5px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #edff66; animation: spin 1s ease-in-out infinite; z-index: 10; opacity: 0; transition: opacity 0.3s ease;';
+    
+    // Add the keyframes for the loader animation
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .video-loading .video-loader {
+            opacity: 1;
+        }
+    `;
+    document.head.appendChild(styleSheet);
+    
+    // Add the loader to the hero video container
+    heroVid.appendChild(loaderElement);
     
     // Function to check if we're on mobile
     function isMobile() {
         return window.innerWidth <= 768;
     }
     
-    // Function to preload the next video
-    function preloadNextVideo() {
-        const nextIndex = (index + 1) % desktopMovieList.length;
-        const preloadLink = document.createElement('link');
-        preloadLink.rel = 'preload';
-        preloadLink.as = 'video';
-        preloadLink.href = isMobile() ? mobileMovieList[nextIndex] : desktopMovieList[nextIndex];
-        
-        // Remove any existing preload links
-        document.querySelectorAll('link[rel="preload"][as="video"]').forEach(el => el.remove());
-        
-        // Add the new preload link
-        document.head.appendChild(preloadLink);
-        console.log('Preloading next video:', preloadLink.href);
+    // Function to enforce visibility of mobile elements
+    function fixMobileDisplay() {
+        if (isMobile()) {
+            console.log("Fixing mobile display");
+            
+            // Force hero section to be visible
+            heroSection.style.display = 'block';
+            heroSection.style.height = '100vh';
+            heroSection.style.width = '100%';
+            
+            // Force video container to be visible
+            heroVid.style.display = 'block';
+            heroVid.style.height = '100%';
+            heroVid.style.width = '100%';
+            heroVid.style.position = 'relative';
+            
+            // Force video to be visible
+            video.style.display = 'block';
+            video.style.width = '100%';
+            video.style.height = '100%';
+            video.style.objectFit = 'cover';
+            
+            // Force UI elements to be visible
+            if (heroInfo) {
+                heroInfo.style.display = 'block';
+                heroInfo.style.opacity = '1';
+                heroInfo.style.zIndex = '999';
+            }
+            
+            if (nextButton) {
+                nextButton.style.display = 'flex';
+                nextButton.style.opacity = '1';
+                nextButton.style.zIndex = '999';
+            }
+            
+            if (gamingText) {
+                gamingText.style.display = 'block';
+                gamingText.style.opacity = '1';
+                gamingText.style.zIndex = '99';
+            }
+        }
+    }
+    
+    // Function to create a fallback for mobile when video fails
+    function createVideoFallback() {
+        if (isMobile()) {
+            console.log("Creating video fallback");
+            
+            // Create a fallback background
+            const fallbackBg = document.createElement('div');
+            fallbackBg.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #000, #333); z-index: 1;';
+            
+            // Insert the fallback before the video
+            heroVid.insertBefore(fallbackBg, video);
+            
+            // Hide the actual video
+            video.style.opacity = '0';
+            
+            // Make sure UI elements are in front of the fallback
+            fixMobileDisplay();
+        }
     }
     
     // Function to update video sources based on device
     function updateVideoSource() {
-        // Show loader
-        document.querySelector('.hero-vid').classList.add('video-loading');
+        // Show loading indicator
+        heroVid.classList.add('video-loading');
         
         // Get all sources
         const sources = video.getElementsByTagName('source');
@@ -99,6 +131,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isMobile()) {
             source.src = mobileMovieList[index];
             console.log('Setting mobile video:', mobileMovieList[index]);
+            
+            // Force preload and inline playback for mobile
+            video.setAttribute('preload', 'auto');
+            video.setAttribute('playsinline', '');
+            video.setAttribute('muted', '');
+            video.muted = true;
+            
+            // Force mobile display fixes right after changing source
+            setTimeout(fixMobileDisplay, 100);
         } else {
             source.src = desktopMovieList[index];
             console.log('Setting desktop video:', desktopMovieList[index]);
@@ -114,142 +155,57 @@ document.addEventListener('DOMContentLoaded', function() {
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     // Hide loader when video starts playing
-                    document.querySelector('.hero-vid').classList.remove('video-loading');
-                    // Preload the next video now
-                    preloadNextVideo();
+                    heroVid.classList.remove('video-loading');
+                    console.log("Video playing successfully");
+                    
+                    // Make sure video is visible
+                    video.style.opacity = '1';
                 }).catch(error => {
                     console.log('Play error:', error);
+                    
                     // Auto-play was prevented, try to play on user interaction
                     document.body.addEventListener('click', function bodyClick() {
                         video.play().then(() => {
-                            document.querySelector('.hero-vid').classList.remove('video-loading');
+                            heroVid.classList.remove('video-loading');
+                            video.style.opacity = '1';
                         });
                         document.body.removeEventListener('click', bodyClick);
                     }, { once: true });
                     
                     // Hide loader after a timeout even if video doesn't play
                     setTimeout(() => {
-                        document.querySelector('.hero-vid').classList.remove('video-loading');
+                        heroVid.classList.remove('video-loading');
+                        
+                        // Create fallback if video fails on mobile
+                        if (isMobile() && video.readyState < 2) {
+                            createVideoFallback();
+                        }
                     }, 2000);
                 });
             }
         } catch (e) {
             console.error('Video play error:', e);
+            
             // Hide loader after error
-            document.querySelector('.hero-vid').classList.remove('video-loading');
-        }
-    }
-    
-    // Function to check if video is visible and playing correctly
-    function checkVideoVisibility() {
-        const heroSection = document.querySelector('.hero-section');
-        
-        // Force correct dimensions and visibility
-        heroSection.style.display = 'block';
-        video.style.width = '100%';
-        video.style.height = '100%';
-        video.style.objectFit = 'cover';
-        
-        // Log video status for debugging
-        console.log('Video ready state:', video.readyState);
-        console.log('Video dimensions:', video.offsetWidth, 'x', video.offsetHeight);
-        
-        // Force reload if video appears to have issues
-        if (video.readyState === 0 || video.readyState === 1) {
-            console.log('Video not ready, reloading...');
-            updateVideoSource();
-        }
-    }
-    
-    // Fix for mobile video autoplay issues
-    function enableMobileVideo() {
-        const videos = document.querySelectorAll('video');
-        videos.forEach(video => {
-            // Force low-power mode for better mobile performance
-            video.setAttribute('playsinline', '');
-            video.setAttribute('muted', '');
-            video.muted = true;
+            heroVid.classList.remove('video-loading');
             
-            // Handle visibility changes
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
-                    video.play().catch(e => console.log('Visibility play error:', e));
-                } else {
-                    video.pause();
-                }
-            });
-        });
-    }
-    
-    // Add lazy loading to card videos
-    function setupLazyVideos() {
-        const cardVideos = document.querySelectorAll('.card video');
-        cardVideos.forEach(video => {
-            // Add lazy loading attribute
-            video.setAttribute('loading', 'lazy');
-            
-            // Create an observer for lazy loading
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // Start playing when in viewport
-                        video.play().catch(e => console.log('Lazy video play error:', e));
-                        observer.disconnect();
-                    }
-                });
-            }, {
-                rootMargin: '100px' // Start loading when 100px away
-            });
-            
-            observer.observe(video);
-        });
-    }
-    
-    // Detect low-bandwidth conditions
-    function checkConnection() {
-        if (navigator.connection) {
-            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
-                // Switch to lightweight version
-                console.log('Slow connection detected, optimizing content...');
-                
-                // Replace card videos with static images on very slow connections
-                if (connection.downlink < 0.5) { // Less than 0.5 Mbps
-                    document.querySelectorAll('.card video').forEach((video, index) => {
-                        // Create a placeholder for the video
-                        const placeholder = document.createElement('div');
-                        placeholder.className = 'video-placeholder';
-                        placeholder.style.cssText = 'width: 100%; height: 100%; background-color: #000; display: flex; align-items: center; justify-content: center;';
-                        
-                        // Add a play icon or text
-                        placeholder.innerHTML = '<div style="color: white; text-align: center;"><div style="font-size: 40px;">▶️</div><div>Click to load video</div></div>';
-                        
-                        // Replace video with placeholder
-                        video.parentNode.replaceChild(placeholder, video);
-                        
-                        // Add click handler to load video when requested
-                        placeholder.addEventListener('click', function() {
-                            const newVideo = document.createElement('video');
-                            newVideo.src = video.src;
-                            newVideo.autoplay = true;
-                            newVideo.muted = true;
-                            newVideo.loop = true;
-                            newVideo.playsinline = true;
-                            newVideo.style.width = '100%';
-                            newVideo.style.height = '100%';
-                            newVideo.style.objectFit = 'cover';
-                            
-                            placeholder.parentNode.replaceChild(newVideo, placeholder);
-                            newVideo.play().catch(e => console.log('Placeholder click play error:', e));
-                        });
-                    });
-                }
+            // Create fallback if video fails on mobile
+            if (isMobile()) {
+                createVideoFallback();
             }
         }
     }
     
     // Main initialization
     function init() {
+        console.log("Initializing app.js");
+        console.log("Device detection:", isMobile() ? "MOBILE" : "DESKTOP");
+        
+        // Fix mobile display immediately
+        if (isMobile()) {
+            fixMobileDisplay();
+        }
+        
         // Set initial video source when page loads
         updateVideoSource();
         
@@ -265,27 +221,38 @@ document.addEventListener('DOMContentLoaded', function() {
             // Debounce resize event
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                updateVideoSource();
-                checkVideoVisibility();
+                // Fix mobile display on resize
+                fixMobileDisplay();
+                
+                // Check if we need to switch video format
+                const wasMobile = isMobile();
+                setTimeout(() => {
+                    if (wasMobile !== isMobile()) {
+                        console.log("Device type changed, updating source");
+                        updateVideoSource();
+                    }
+                }, 300);
             }, 300);
         });
-        
-        // Check video visibility after a short delay
-        setTimeout(checkVideoVisibility, 1000);
-        
-        // Enable optimizations for mobile
-        enableMobileVideo();
-        
-        // Setup lazy loading for other videos
-        setupLazyVideos();
-        
-        // Check connection speed
-        checkConnection();
-        
-        // Preload the next video
-        preloadNextVideo();
     }
     
     // Start initialization
     init();
+    
+    // Additional checks to ensure mobile display works
+    if (isMobile()) {
+        // Try multiple times to ensure display
+        for (let i = 1; i <= 3; i++) {
+            setTimeout(() => {
+                console.log(`Mobile display check ${i}`);
+                fixMobileDisplay();
+                
+                // If video still has issues after 3 seconds, use fallback
+                if (i === 3 && video.readyState < 2) {
+                    console.warn("Video still not ready after 3 seconds, using fallback");
+                    createVideoFallback();
+                }
+            }, i * 1000);
+        }
+    }
 });
