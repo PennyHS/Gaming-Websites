@@ -632,9 +632,7 @@ header{
     .footer p{
         display: none;
     }
-    .footer ul{
-        margin-left: 70px;
-    }
+
     .stones-img{
         margin-top: 80%;
         width: 400px;
