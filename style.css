@@ -68,6 +68,8 @@ header{
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.5s ease;
+
 }
 
 .hero-info {
@@ -174,6 +176,11 @@ header{
     
     .hero-info button {
         padding: 10px 30px;
+    }
+    .hero-video {
+        display: block;
+        width: 100%;
+        height: 100%;
     }
 }
 
