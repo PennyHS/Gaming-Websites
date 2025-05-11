@@ -1,0 +1,39 @@
+/* Mobile-specific animations that don't use view timeline */
+@media (max-width: 768px) {
+    /* Override the view timeline animations completely for mobile */
+    .autoBlur {
+        animation: none !important;
+        opacity: 1 !important;
+        filter: blur(0) !important;
+        transform: none !important;
+    }
+    
+    .autoTakeFull {
+        animation: none !important;
+        transition: all 0.8s ease-out;
+    }
+    
+    .autoTakeFull.animate {
+        width: 100% !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        margin-bottom: 100px !important;
+    }
+    
+    .autoDisplay {
+        animation: mobileDisplayIn 0.8s ease-out forwards !important;
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    
+    @keyframes mobileDisplayIn {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
