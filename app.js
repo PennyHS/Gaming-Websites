@@ -3,17 +3,17 @@ const video = document.querySelector('.hero-video');
 
 // Video lists
 const desktopMovieList = [
-    'public/videos/hero-3.mp4',
+    'videos/hero-3.mp4',
     'videos/hero-4.mp4',
     'videos/hero-1.mp4',
     'videos/hero-2.mp4'
 ];
 
 const mobileMovieList = [
-    'public/videos-mobile/hero-3-mobile.mp4',
-    'public/videos-mobile/hero-4-mobile.mp4',
-    'public/videos-mobile/hero-1-mobile.mp4',
-    'public/videos-mobile/hero-2-mobile.mp4'
+    'videos-mobile/hero-3-mobile.mp4',
+    'videos-mobile/hero-4-mobile.mp4',
+    'videos-mobile/hero-1-mobile.mp4',
+    'videos-mobile/hero-2-mobile.mp4'
 ];
 
 let index = 0;
